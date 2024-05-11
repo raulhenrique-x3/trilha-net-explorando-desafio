@@ -4,22 +4,65 @@ using DesafioProjetoHospedagem.Models;
 Console.OutputEncoding = Encoding.UTF8;
 
 // Cria os modelos de hóspedes e cadastra na lista de hóspedes
-List<Pessoa> hospedes = new List<Pessoa>();
+Pessoa pessoa = new Pessoa();
+Suite suites = new Suite();
+Reserva reserva = new Reserva();
 
-Pessoa p1 = new Pessoa(nome: "Hóspede 1");
-Pessoa p2 = new Pessoa(nome: "Hóspede 2");
+Console.WriteLine("Bem vindo ao sistema de hospedagem!");
+bool exibirMenu = true;
 
-hospedes.Add(p1);
-hospedes.Add(p2);
+while (exibirMenu)
+{
+    Console.WriteLine("Digite a opção desejada:");
+    Console.WriteLine("1 - Cadastrar hóspedes");
+    Console.WriteLine("2 - Cadastrar suíte");
+    Console.WriteLine("3 - Reservar suíte");
+    Console.WriteLine("4 - Exibir hospedes cadastrados");
+    Console.WriteLine("5 - Exibir suites cadastradas");
+    Console.WriteLine("6 - Sair");
 
-// Cria a suíte
-Suite suite = new Suite(tipoSuite: "Premium", capacidade: 4, valorDiaria: 50);
+    string opcao = Console.ReadLine();
 
-// Cria uma nova reserva, passando a suíte e os hóspedes
-Reserva reserva = new Reserva(diasReservados: 15);
-reserva.CadastrarSuite(suite);
-reserva.CadastrarHospedes(hospedes);
-
-// Exibe a quantidade de hóspedes e o valor da diária
-Console.WriteLine($"Hóspedes: {reserva.ObterQuantidadeHospedes()}");
-Console.WriteLine($"Valor diária: {reserva.CalcularValorDiaria()}");
+    switch (opcao)
+    {
+        case "1":
+            pessoa.cadastrarPessoa();
+            Console.WriteLine(pessoa.Nome);
+            break;
+        case "2":
+            suites.criarSuite();
+            break;
+        case "3":
+            foreach (Suite suite in suites.listaSuites())
+            {
+                if (suite.Capacidade > 0 && pessoa.retornarListaPessoa().Count > 0)
+                {
+                    reserva.CadastrarHospedes(pessoa.retornarListaPessoa(), suites.listaSuites());
+                    int diasReservados = reserva.ReservarDias();
+                    Console.WriteLine($"Hóspedes: {reserva.ObterQuantidadeHospedes()}");
+                    Console.WriteLine($"Dias reservados: {diasReservados}");
+                    Console.WriteLine($"Valor Suite: R$ {suite.ValorDiaria}");
+                    Console.WriteLine($"Valor diária: R$ {reserva.CalcularValorDiaria(diasReservados, suite)}");
+                    Console.WriteLine($"Total: R$ {reserva.CalcularValorDiaria(diasReservados, suite) * diasReservados}");
+                }
+                else
+                {
+                    Console.WriteLine("Erro: Você deve cadastrar uma suíte e hóspedes antes de reservar.");
+                }
+                break;
+            }
+            break;
+        case "4":
+            pessoa.listarHospedes();
+            break;
+        case "5":
+            suites.listarSuites();
+            break;
+        case "6":
+            exibirMenu = false;
+            break;
+        default:
+            Console.WriteLine("Opção inválida");
+            break;
+    }
+}
